@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Enquetes</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #020617, #0f172a, #1e3a8a);
+      color: white;
+      min-height: 100vh;
+      padding: 30px 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 36px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .card {
+      width: 320px;
+      background: rgba(30, 41, 59, 0.95);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .status {
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .nao-iniciada {
+      color: #facc15;
+    }
+
+    .em-andamento {
+      color: #4ade80;
+    }
+
+    .finalizada {
+      color: #f87171;
+    }
+
+    .info {
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    button {
+      margin-top: 8px;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: bold;
+      background: #3b82f6;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    .vazio {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 18px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lista de Enquetes</h1>
+  <div class="container" id="lista"></div>
+
+  <script>
+    function formatarData(data) {
+      const d = new Date(data);
+      return d.toLocaleString('pt-BR');
+    }
+
+    fetch('http://localhost:3000/enquetes')
+      .then(res => res.json())
+      .then(data => {
+        const lista = document.getElementById('lista');
+
+        if (!data.length) {
+          lista.innerHTML = '<div class="vazio">Nenhuma enquete cadastrada.</div>';
+          return;
+        }
+
+        data.forEach(enquete => {
+          let statusClasse = 'nao-iniciada';
+
+          if (enquete.status === 'Em andamento') {
+            statusClasse = 'em-andamento';
+          } else if (enquete.status === 'Finalizada') {
+            statusClasse = 'finalizada';
+          }
+
+          const card = document.createElement('div');
+          card.className = 'card';
+
+          card.innerHTML = `
+            <h2>${enquete.titulo}</h2>
+            <div class="status ${statusClasse}">${enquete.status}</div>
+            <div class="info"><strong>Início:</strong> ${formatarData(enquete.data_inicio)}</div>
+            <div class="info"><strong>Fim:</strong> ${formatarData(enquete.data_fim)}</div>
+            <button onclick="abrirEnquete(${enquete.id})">Abrir enquete</button>
+          `;
+
+          lista.appendChild(card);
+        });
+      });
+
+    function abrirEnquete(id) {
+      window.location.href = `index.html?id=${id}`;
+    }
+  </script>
+</body>
+</html>
